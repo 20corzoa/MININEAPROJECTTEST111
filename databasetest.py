@@ -274,15 +274,31 @@ class dataBase:
         except Exception as e:
             print("error creating user :", e)
             self.db.rollback()
+    
+    def read_userID_from_username(self, username):
+        try:
+            query = "SELECT userID FROM user WHERE username = %s"
+            values = (username,)
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone()
+            if result:
+                return result[0]
+            else:
+                print(f"No user found with username: {username}")
+                return None
+
+        except Exception as e:
+            print(f"error reading userID from username: {e}")
+            return None
         
     def read_user_role(self, username):
         try:
-            query = "SELECT role FROM user WHERE username = %s"
+            query = "SELECT role FROM users WHERE username = %s"
             values = (username)
             self.cursor.execute(query, values)
             result = self.cursor.fetchone()
             if result:
-                return result[0]  # Return the role
+                return str(result[0]) if result and result[0] is not None else None
             else:
                 return None
         except:
@@ -300,7 +316,7 @@ class dataBase:
             print("error")
             return None
         
-    def read_all_user(self):
+    def read_all_users(self):
         try:
             self.cursor = self.db.cursor()
             print(self.cursor)
@@ -483,7 +499,3 @@ class dataBase:
 
 
 
-db = dataBase()
-user = db.read_all_user()
-print(user)
-db.close()

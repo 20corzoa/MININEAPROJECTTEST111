@@ -10,8 +10,11 @@ def login():
     if st.button("LOGIN"):
         if myDatabase.verify_user(username, password) == True:
             roleID = myDatabase.read_user_role(username)
-            role = "ADMIN" if roleID == 1 else "TEACHER"
+            role = "ADMIN" if roleID == "1" else "TEACHER"
+            st.session_state.username = username
+            st.session_state.userID = myDatabase.read_userID_from_username(username)
             st.session_state.role = role
+            st.write(f"Logged in as {st.session_state.username} with role {st.session_state.role} and userID {st.session_state.userID}")
             st.success("Login successful!")
             st.rerun()
         else:
