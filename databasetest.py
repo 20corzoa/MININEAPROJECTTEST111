@@ -9,11 +9,10 @@ import mysql.connector
 
 class dataBase:
     def __init__(self):
-        self.db = mysql.connector.connect(
-            host="localhost",
-            port=3306,
+          self.db = mysql.connector.connect(
+            host="127.0.0.1",
             user="root",
-            password="Junior2014@",
+            password="TomaCroomeDB",
             database="mydb"
         )
 
