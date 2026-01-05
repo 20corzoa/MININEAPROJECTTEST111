@@ -135,30 +135,36 @@ class dataBase:
     
     #trip create read update delete
 
-    def create_trip(self, destination, date, returnDate, status, leaderID):
+    def create_trip(self, tripID, destination, date, returnDate, status, leaderID):
         try:
-            query = "INSERT INTO trip(destination, date, returnDate, status, leaderID) VALUES(%s, %s, %s, %s, %s)"
-            values = (destination, date, returnDate, status, leaderID)
-            self.cursor().execute(query, values)
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            query = "INSERT INTO trips(tripID, destination, date, returnDate, status, leaderID) VALUES(%s, %s, %s, %s, %s, %s)"
+            values = (tripID, destination, date, returnDate, status, leaderID)
+            print(query)
+            print(values)
+            self.cursor.execute(query, values)
             self.db.commit()
-            print("trip created")
-        except:
-            self.db.rollback()
-            print("error")
+            print("db: trip created")
+        except Exception as e:
+            print("error creating trip :", e)
+            self.db.rollback()  
 
     def read_all_trips(self):
         try:
-            query = "SELECT * FROM trip"
-            self.cursor().execute(query)
-            results = self.cursor().fetchall()
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            query = "SELECT * FROM trips"
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
             return results
-        except:
-            print("error")
+        except Exception as e:
+            print("error reading all trips :", e)
             return []
     
     def read_trip_by_id(self, tripID):
         try:
-            query = "SELECT * FROM trip WHERE tripID = %s"
+            query = "SELECT * FROM trips WHERE tripID = %s"
             values = (tripID)
             self.cursor().execute(query, values)
             result = self.cursor().fetchone()
@@ -169,7 +175,7 @@ class dataBase:
     
     def read_trips_by_leader(self, leaderID):
         try:
-            query = "SELECT * FROM trip WHERE leaderID = %s"
+            query = "SELECT * FROM trips WHERE leaderID = %s"
             values = (leaderID)
             self.cursor().execute(query, values)
             results = self.cursor().fetchall()
@@ -180,7 +186,7 @@ class dataBase:
         
     def read_trips_by_destination(self, destination):
         try:
-            query = "SELECT * FROM trip WHERE destination = %s"
+            query = "SELECT * FROM trips WHERE destination = %s"
             values = (destination)
             self.cursor().execute(query, values)
             results = self.cursor().fetchall()
@@ -197,7 +203,7 @@ class dataBase:
                 fields.append(f"{key} = %s")
                 values.append(value)
             values.append(tripID)
-            query = f"UPDATE trip SET {', '.join(fields)} WHERE tripID = %s"
+            query = f"UPDATE trips SET {', '.join(fields)} WHERE tripID = %s"
             self.cursor().execute(query, tuple(values))
             self.db.commit()
             print("trip updated")
@@ -207,14 +213,16 @@ class dataBase:
 
     def delete_trip(self, tripID):
         try:
-            query = "DELETE FROM trip WHERE tripID = %s"
-            values = (tripID)
-            self.cursor().execute(query, values)
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            query = "DELETE FROM trips WHERE tripID = "+str(tripID)
+            values = ()
+            self.cursor.execute(query, values)
             self.db.commit()
             print("trip deleted")
         except:
             self.db.rollback()
-            print("error")
+            print("error deleting trip")
     
 
 
@@ -280,6 +288,34 @@ class dataBase:
         except Exception as e:
             print("error creating user :", e)
             self.db.rollback()
+
+    def read_userID_from_username(self, username):
+        try:
+            query = "SELECT userID FROM users WHERE username = %s"
+            values = (username,)
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone()
+            if result:
+                return result[0]
+            else:
+                print(f"No user found with username: {username}")
+                return None
+
+        except Exception as e:
+            print(f"error reading userID from username: {e}")
+            return None
+        
+    def read_user_role(self, username):
+        try:
+            query = "SELECT role FROM users WHERE username = %s"
+            values = (username,)
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone()
+            print(result)
+            return "1" if  result[0] == "Admin" else None
+        except:
+            print("error")
+            return None
 
     def read_user_by_username(self, username):
         try:

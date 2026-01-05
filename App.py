@@ -1,24 +1,24 @@
 import streamlit as st
+import _mysql_connector
 import databasetest as dbt
 
 def login():
     st.title("JUDD TRIPS")                                         
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
+    #st.write(myDatabase.read_all_user()) 
     if st.button("LOGIN"):
-        if username == "admin" and password == "password":   #This is where the authentication logic would go, called from a database 
-            role = "ADMIN"
+        if myDatabase.verify_user(username, password) == True:
+            roleID = myDatabase.read_user_role(username)
+            role = "ADMIN" if roleID == "1" else "TEACHER"
+            st.session_state.username = username
+            st.session_state.userID = myDatabase.read_userID_from_username(username)
             st.session_state.role = role
-            st.success("Login successful!")
-            st.rerun()
-        elif username == "teacher" and password == "password":
-            role = "TEACHER"
-            st.session_state.role = role
+            st.write(f"Logged in as {st.session_state.username} with role {st.session_state.role} and userID {st.session_state.userID}")
             st.success("Login successful!")
             st.rerun()
         else:
             st.error("Invalid username or password.")
-                #Role is saved in session state for access control throughout the app after rerun
 
 def Logout():
     st.session_state.role = None
