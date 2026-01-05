@@ -9,7 +9,7 @@ import mysql.connector
 
 class dataBase:
     def __init__(self):
-          self.db = mysql.connector.connect(
+        self.db = mysql.connector.connect(
             host="127.0.0.1",
             user="root",
             password="TomaCroomeDB",
@@ -266,7 +266,7 @@ class dataBase:
         try:
             self.cursor = self.db.cursor()
             print(self.cursor)
-            query = "INSERT INTO users (userid, username, password, fName, lName, email, phone, role) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO user (userid, username, password, fName, lName, email, phone, role) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             values = (str(userid), username, password, fname, lname, email, phone, role_id)
             self.cursor.execute(query, values)
             self.db.commit()
@@ -274,6 +274,20 @@ class dataBase:
         except Exception as e:
             print("error creating user :", e)
             self.db.rollback()
+        
+    def read_user_role(self, username):
+        try:
+            query = "SELECT role FROM user WHERE username = %s"
+            values = (username)
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone()
+            if result:
+                return result[0]  # Return the role
+            else:
+                return None
+        except:
+            print("error")
+            return None
 
     def read_user_by_username(self, username):
         try:
@@ -286,16 +300,16 @@ class dataBase:
             print("error")
             return None
         
-    def read_all_users(self):
+    def read_all_user(self):
         try:
             self.cursor = self.db.cursor()
             print(self.cursor)
-            query = "SELECT * FROM users"
+            query = "SELECT * FROM user"
             self.cursor.execute(query)
             results = self.cursor.fetchall()
             return results
         except Exception as e:
-            print("error reading all users :", e)
+            print("error reading all user :", e)
             return []
 
     def generate_next_id(self):
@@ -352,7 +366,7 @@ class dataBase:
             fields.append("role = %s")
             values.append(role_id)
             #values.append(userid)
-            query = f"UPDATE users SET username = %s, password = %s, fName = %s, lName = %s, email = %s, phone = %s, role = %s WHERE userID = %s"
+            query = f"UPDATE user SET username = %s, password = %s, fName = %s, lName = %s, email = %s, phone = %s, role = %s WHERE userID = %s"
             values =(username, password, fname, lname, email, phone, role_id, str(userid))
             self.cursor.execute(query, tuple(values))
             self.db.commit()
@@ -366,7 +380,7 @@ class dataBase:
         try:
             self.cursor = self.db.cursor()
             print(self.cursor)
-            query = "DELETE FROM users WHERE userID = %s"
+            query = "DELETE FROM user WHERE userID = %s"
             values = list(str(userID))
             self.cursor.execute(query, values)
             self.db.commit()
@@ -378,7 +392,7 @@ class dataBase:
 
     def verify_user(self, username, password):
         try:
-            query = "SELECT * FROM users WHERE username = %s AND password = %s"
+            query = "SELECT * FROM user WHERE username = %s AND password = %s"
             values = (username, password)
             self.cursor.execute(query, values)
             result = self.cursor.fetchone()
@@ -466,3 +480,10 @@ class dataBase:
         except:
             self.db.rollback()
             print("error")
+
+
+
+db = dataBase()
+user = db.read_all_user()
+print(user)
+db.close()
