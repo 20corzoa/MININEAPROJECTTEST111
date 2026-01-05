@@ -32,18 +32,21 @@ class dataBase:
 
 #student create read update delete
 
-    def create_student(self, fName, lNName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID):
+    def create_student(self, studentID, fName, lNName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID):
         try:
             self.cursor = self.db.cursor()
             print(self.cursor)
-            query = "INSERT INTO students (fName, lName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-            values = (fName,lNName,gender,dob.year,dob.month,dob.day, year, form, house, sEmail, sPhone, consent, contactID, medicalID)
+            query = "INSERT INTO students (studentID, fName, lName, gender, dob, yeargroup, form, house, Email, Phone, consent, contactID, medicalID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            values = (studentID,fName,lNName,gender,dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID)
+            print(query)
+            print(values)
             self.cursor.execute(query, values)
             self.db.commit()
             print("db: student created")
         except Exception as e:
             print("error creating student :", e)
             self.db.rollback()  
+
 
     def read_all_students(self): #read all students from database
         try:
@@ -70,10 +73,11 @@ class dataBase:
             return None
         
 
-    def update_student(self, studentID, fName, lNName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID): #kwargs means any number of parameters 
+    def update_student(self, studentID, fName, lNName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID): 
         fields = []
         values = []
         try:
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
             self.cursor = self.db.cursor()
             print(self.cursor)
             fields.append("studentID = %s")
@@ -86,7 +90,7 @@ class dataBase:
             values.append(gender)
             fields.append("dob = %s")
             values.append(dob)
-            fields.append("year = %s")
+            fields.append("yeargroup = %s")
             values.append(year)
             fields.append("form = %s")
             values.append(form)
@@ -102,9 +106,10 @@ class dataBase:
             values.append(contactID)
             fields.append("medicalID = %s")
             values.append(medicalID)
-            #values.append(userid)
-            query = f"UPDATE students SET fName = %s, lName = %s, gender = %s, dob = %s, year = %s, form = %s, house = %s, email = %s, phone = %s, consent = %s, contactID = %s, medicalID = %s WHERE studentID = %s"
-            values =(fName, lNName, gender, dob.year,dob.month,dob.day, year, form, house, sEmail, sPhone, consent, contactID, medicalID, studentID)
+            query = f"UPDATE students SET fName = %s, lName = %s, gender = %s, dob = %s, yeargroup = %s, form = %s, house = %s, email = %s, phone = %s, consent = %s, contactID = %s, medicalID = %s WHERE studentID = %s"
+            values =(fName, lNName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID, studentID)
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+            print(values,query)
             self.cursor.execute(query, tuple(values))
             self.db.commit()
             print("student updated")
@@ -118,7 +123,7 @@ class dataBase:
             self.cursor = self.db.cursor()
             print(self.cursor)
             query = "DELETE FROM students WHERE studentID = %s"
-            values = list(str(studentID))
+            values = (studentID,)
             self.cursor.execute(query, values)
             self.db.commit()
             print("Student deleted")

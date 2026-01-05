@@ -64,8 +64,7 @@ with st.form("userForm"):
         deleted = st.form_submit_button("Delete")   
         
   
-    if deleted_button:
-        if deleted:
+    if deleted_button and deleted:
             # Delete user
             st.session_state.UsersList.pop(userSelection)
             print ("Deleting user in database")
