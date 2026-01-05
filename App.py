@@ -1,4 +1,5 @@
 import streamlit as st
+import databasetest as dbt
 
 def login():
     st.title("JUDD TRIPS")                                         
@@ -27,9 +28,11 @@ def Logout():
 if "role" not in st.session_state:      #Gatekeeps access to the app only allowing logged in users to access it
     st.session_state.role = None
 
-ROLES = [None, "ADMIN", "TEACHER", "STUDENT"]
+ROLES = [None, "ADMIN", "TEACHER"]
 
 role = st.session_state.role
+
+myDatabase = dbt.dataBase()
 
 logout_page = st.Page(Logout, title="Logout", icon=":material/logout:")
 settings = st.Page("UNIVERSAL/Settings.py",title="Settings", icon=":material/settings:")
@@ -41,13 +44,15 @@ TravelPlan = st.Page("TEACHER/TravelPlan.py",title="Travel Plan", icon=":materia
 Register = st.Page("TEACHER/Register.py",title="Register", icon=":material/thumb_up:")
 
 AdminHome = st.Page("ADMIN/AdminHome.py",title="Admin Home", icon=":material/home:", default=(role=="ADMIN"))
-Accounts = st.Page("ADMIN/Accounts.py",title="Accounts", icon=":material/thumb_up:")
+Users = st.Page("ADMIN/Users.py",title="Users", icon=":material/thumb_up:")
 Calendar = st.Page("ADMIN/Calendar.py",title="Calendar", icon=":material/thumb_up:")
 Trips = st.Page("ADMIN/Trips.py",title="Trips", icon=":material/thumb_up:")
+TripStudents = st.Page("ADMIN/TripStudents.py",title="Trip Students", icon=":material/thumb_up:")
+Students = st.Page("ADMIN/Students.py",title="Students", icon=":material/thumb_up:")
 
 account_pages = [logout_page, settings]
 teacher_pages = [TeacherHome, Documents, EmergencyInfo, TravelPlan, Register]
-admin_pages = [AdminHome, Accounts, Calendar, Trips]
+admin_pages = [AdminHome, Users, Calendar, Trips, Students, TripStudents]
 
 st.title("JUDD TRIPS")
 page_dict = {}

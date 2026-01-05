@@ -1,4 +1,6 @@
+
 import mysql.connector
+
 #to connect database
 
 
@@ -8,14 +10,18 @@ import mysql.connector
 class dataBase:
     def __init__(self):
         self.db = mysql.connector.connect(
-            host="127.0.0.1",
+            host="localhost",
+            port=3306,
             user="root",
-            password="TomaCroomeDB",
+            password="Junior2014@",
             database="mydb"
         )
-        if self.db.is_connected():
-            self.cursor = self.db.cursor()
-            print("connected to database")
+
+        self.cursor = self.db.cursor()
+        print(self.cursor)
+#        if self.db.is_connected():
+#            self.cursor = self.db.cursor()
+#            print("connected to database")
 
     def close(self):
         if self.db.is_connected():
@@ -26,28 +32,29 @@ class dataBase:
 
 #student create read update delete
 
-    def create_student(self, fName, lName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID):
-        query = "INSERT INTO student (fName, lName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        #sql query INSERT the values held by the placeholder %s, which means only valid data can be inputted(no sql querys can be enterred)
-        values = (fName, lName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID)
+    def create_student(self, fName, lNName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID):
         try:
-            self.cursor().execute(query, values)
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            query = "INSERT INTO students (fName, lName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            values = (fName,lNName,gender,dob.year,dob.month,dob.day, year, form, house, sEmail, sPhone, consent, contactID, medicalID)
+            self.cursor.execute(query, values)
             self.db.commit()
-            # execute the query and commit the changes to the database
-            print("student added")
-
-        except: #if there is any errors:
-            self.db.rollback() #reverse any changes to last commit
-            print("error")
+            print("db: student created")
+        except Exception as e:
+            print("error creating student :", e)
+            self.db.rollback()  
 
     def read_all_students(self): #read all students from database
         try:
-            query = "SELECT * FROM student"
-            self.cursor().execute(query)
-            results = self.cursor().fetchall() #fetches the results of the query executed by the cursor
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            query = "SELECT * FROM students"
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
             return results
-        except:
-            print("error")
+        except Exception as e:
+            print("error reading all students :", e)
             return []
 
 
@@ -63,33 +70,60 @@ class dataBase:
             return None
         
 
-    def update_student(self, studentID, **kwargs): #kwargs means any number of parameters 
-        #to use method db.update_student(1, fName="naame", lName="lastname")
-        #works like dictionary with key and value pairs
+    def update_student(self, studentID, fName, lNName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID): #kwargs means any number of parameters 
         fields = []
         values = []
         try:
-            for key, value in kwargs.items():
-                fields.append(f"{key} = %s") #creates a list of the fields to be updated 
-                values.append(value) #creates a list of the new values
-            
-            values.append(studentID) #append studentID to the end of the values list for the WHERE clause
-            query = f"UPDATE student SET {', '.join(fields)} WHERE studentID = %s" #{', '.join(fields)} joins the fields list into a string separated by commas
-            self.cursor().execute(query, tuple(values))
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            fields.append("studentID = %s")
+            values.append(studentID)
+            fields.append("fName = %s")
+            values.append(fName)
+            fields.append("lName = %s")
+            values.append(lNName)
+            fields.append("gender = %s")
+            values.append(gender)
+            fields.append("dob = %s")
+            values.append(dob)
+            fields.append("year = %s")
+            values.append(year)
+            fields.append("form = %s")
+            values.append(form)
+            fields.append("house = %s")
+            values.append(house)
+            fields.append("email = %s")
+            values.append(sEmail)
+            fields.append("phone = %s")
+            values.append(sPhone)
+            fields.append("consent = %s")
+            values.append(consent)
+            fields.append("contactID = %s")
+            values.append(contactID)
+            fields.append("medicalID = %s")
+            values.append(medicalID)
+            #values.append(userid)
+            query = f"UPDATE students SET fName = %s, lName = %s, gender = %s, dob = %s, year = %s, form = %s, house = %s, email = %s, phone = %s, consent = %s, contactID = %s, medicalID = %s WHERE studentID = %s"
+            values =(fName, lNName, gender, dob.year,dob.month,dob.day, year, form, house, sEmail, sPhone, consent, contactID, medicalID, studentID)
+            self.cursor.execute(query, tuple(values))
             self.db.commit()
             print("student updated")
-        except:
+        except Exception as e:
+            print("error updating student :", e)
             self.db.rollback()
             print("error")
     
     def delete_student(self, studentID):
         try:
-            query = "DELETE FROM student WHERE studentID = %s"
-            values = (studentID)
-            self.cursor().execute(query, values)
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            query = "DELETE FROM students WHERE studentID = %s"
+            values = list(str(studentID))
+            self.cursor.execute(query, values)
             self.db.commit()
-            print("student deleted")
-        except:
+            print("Student deleted")
+        except Exception as e:
+            print("error deleting student :", e)
             self.db.rollback()
             print("error")
 
@@ -229,15 +263,17 @@ class dataBase:
 
     #USER create read update delete
 
-    def create_user(self, username, password, fname, lname, email, phone, role_id):
+    def create_user(self, userid, username, password, fname, lname, email, phone, role_id):
         try:
-            query = "INSERT INTO user (username, password, fName, lName, email, phone, role_roleID) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-            values = (username, password, fname, lname, email, phone, role_id)
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            query = "INSERT INTO users (userid, username, password, fName, lName, email, phone, role) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            values = (str(userid), username, password, fname, lname, email, phone, role_id)
             self.cursor.execute(query, values)
             self.db.commit()
-            print("user created")
-        except:
-            print("error")
+            print("db: user created")
+        except Exception as e:
+            print("error creating user :", e)
             self.db.rollback()
 
     def read_user_by_username(self, username):
@@ -253,14 +289,36 @@ class dataBase:
         
     def read_all_users(self):
         try:
-            query = "SELECT * FROM user"
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            query = "SELECT * FROM users"
             self.cursor.execute(query)
             results = self.cursor.fetchall()
             return results
-        except:
-            print("error")
+        except Exception as e:
+            print("error reading all users :", e)
             return []
-        
+
+    def generate_next_id(self):
+        try:
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            query = "SELECT * FROM variables"
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()[0]
+            nextID = results[0] + 1
+            updateQuery = "UPDATE variables SET NextID ="+ str(nextID)
+            print ("nextID generated:", nextID)
+            print("updated querey:", updateQuery)
+            self.cursor.execute(updateQuery)
+            self.db.commit()
+            return nextID
+        except Exception as e:
+            print("error creating new user ID :", e)
+            return -1
+
+
+
     def read_user_by_id(self, userID):
         try:
             query = "SELECT * FROM user WHERE userID = %s"
@@ -271,37 +329,57 @@ class dataBase:
         except:
             print("error")
             return None
-    
-    def update_user(self, userID, **kwargs):
+
+    def update_user(self, userid, username, password, fname, lname, email, phone, role_id):
         fields = []
         values = []
         try:
-            for key, value in kwargs.items():
-                fields.append(f"{key} = %s")
-                values.append(value)
-            values.append(userID)
-            query = f"UPDATE user SET {', '.join(fields)} WHERE userID = %s"
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            fields.append("userid = %s")
+            values.append(userid)
+            fields.append("username = %s")
+            values.append(username)
+            fields.append("password = %s")
+            values.append(password)
+            fields.append("fName = %s")
+            values.append(fname)
+            fields.append("lName = %s")
+            values.append(lname)
+            fields.append("email = %s")
+            values.append(email)
+            fields.append("phone = %s")
+            values.append(phone)
+            fields.append("role = %s")
+            values.append(role_id)
+            #values.append(userid)
+            query = f"UPDATE users SET username = %s, password = %s, fName = %s, lName = %s, email = %s, phone = %s, role = %s WHERE userID = %s"
+            values =(username, password, fname, lname, email, phone, role_id, str(userid))
             self.cursor.execute(query, tuple(values))
             self.db.commit()
             print("user updated")
-        except:
+        except Exception as e:
+            print("error updating user :", e)
             self.db.rollback()
             print("error")
 
     def delete_user(self, userID):
         try:
-            query = "DELETE FROM user WHERE userID = %s"
-            values = (userID)
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            query = "DELETE FROM users WHERE userID = %s"
+            values = list(str(userID))
             self.cursor.execute(query, values)
             self.db.commit()
             print("user deleted")
-        except:
+        except Exception as e:
+            print("error deleting user :", e)
             self.db.rollback()
             print("error")
 
     def verify_user(self, username, password):
         try:
-            query = "SELECT * FROM user WHERE username = %s AND password = %s"
+            query = "SELECT * FROM users WHERE username = %s AND password = %s"
             values = (username, password)
             self.cursor.execute(query, values)
             result = self.cursor.fetchone()
