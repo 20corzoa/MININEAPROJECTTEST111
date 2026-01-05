@@ -35,7 +35,7 @@ class dataBase:
         try:
             self.cursor = self.db.cursor()
             print(self.cursor)
-            query = "INSERT INTO students (fName, lName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO student (fName, lName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             values = (fName,lNName,gender,dob.year,dob.month,dob.day, year, form, house, sEmail, sPhone, consent, contactID, medicalID)
             self.cursor.execute(query, values)
             self.db.commit()
@@ -44,16 +44,16 @@ class dataBase:
             print("error creating student :", e)
             self.db.rollback()  
 
-    def read_all_students(self): #read all students from database
+    def read_all_student(self): #read all student from database
         try:
             self.cursor = self.db.cursor()
             print(self.cursor)
-            query = "SELECT * FROM students"
+            query = "SELECT * FROM student"
             self.cursor.execute(query)
             results = self.cursor.fetchall()
             return results
         except Exception as e:
-            print("error reading all students :", e)
+            print("error reading all student :", e)
             return []
 
 
@@ -102,7 +102,7 @@ class dataBase:
             fields.append("medicalID = %s")
             values.append(medicalID)
             #values.append(userid)
-            query = f"UPDATE students SET fName = %s, lName = %s, gender = %s, dob = %s, year = %s, form = %s, house = %s, email = %s, phone = %s, consent = %s, contactID = %s, medicalID = %s WHERE studentID = %s"
+            query = f"UPDATE student SET fName = %s, lName = %s, gender = %s, dob = %s, year = %s, form = %s, house = %s, email = %s, phone = %s, consent = %s, contactID = %s, medicalID = %s WHERE studentID = %s"
             values =(fName, lNName, gender, dob.year,dob.month,dob.day, year, form, house, sEmail, sPhone, consent, contactID, medicalID, studentID)
             self.cursor.execute(query, tuple(values))
             self.db.commit()
@@ -116,7 +116,7 @@ class dataBase:
         try:
             self.cursor = self.db.cursor()
             print(self.cursor)
-            query = "DELETE FROM students WHERE studentID = %s"
+            query = "DELETE FROM student WHERE studentID = %s"
             values = list(str(studentID))
             self.cursor.execute(query, values)
             self.db.commit()
@@ -217,7 +217,7 @@ class dataBase:
 
     def assign_student_to_trip(self, tripID, studentID):
         try:
-            query = "INSERT INTO trip_students (tripID, studentID) VALUES (%s, %s)"
+            query = "INSERT INTO trip_student (tripID, studentID) VALUES (%s, %s)"
             values = (tripID, studentID)
             self.cursor().execute(query, values)
             self.db.commit()
@@ -228,7 +228,7 @@ class dataBase:
 
     def remove_student_from_trip(self, tripID, studentID):
         try:
-            query = "DELETE FROM trip_students WHERE tripID = %s AND studentID = %s"
+            query = "DELETE FROM trip_student WHERE tripID = %s AND studentID = %s"
             values = (tripID, studentID)
             self.cursor().execute(query, values)
             self.db.commit()
@@ -237,9 +237,9 @@ class dataBase:
             self.db.rollback()
             print("error")
     
-    def get_trip_students(self, tripID): #get all students assigned to a trip
+    def get_trip_student(self, tripID): #get all student assigned to a trip
         try:
-            query = "SELECT studentID FROM trip_students WHERE tripID = %s"
+            query = "SELECT studentID FROM trip_student WHERE tripID = %s"
             values = (tripID)
             self.cursor().execute(query, values)
             results = self.cursor().fetchall()
@@ -250,7 +250,7 @@ class dataBase:
     
     def get_student_trips(self, studentID): #get all trips a student is assigned to
         try:
-            query = "SELECT tripID FROM trip_students WHERE studentID = %s"
+            query = "SELECT tripID FROM trip_student WHERE studentID = %s"
             values = (studentID)
             self.cursor().execute(query, values)
             results = self.cursor().fetchall()
@@ -460,8 +460,8 @@ class dataBase:
         try:
             query = """SELECT medical_information.* FROM medical_information
                        JOIN student ON medical_information.medicalID = student.medicalID
-                       JOIN trip_students ON student.studentID = trip_students.studentID
-                       WHERE trip_students.tripID = %s"""
+                       JOIN trip_student ON student.studentID = trip_student.studentID
+                       WHERE trip_student.tripID = %s"""
             values = (tripID)
             self.cursor.execute(query, values)
             results = self.cursor.fetchall()
@@ -497,5 +497,14 @@ class dataBase:
             self.db.rollback()
             print("error")
 
-
+    def read_emergency_info_by_id(self, studentID):
+            try:
+                query = "SELECT * FROM emergency_contact WHERE studentID = %s"
+                values = (studentID)
+                self.cursor.execute(query, values)
+                result = self.cursor.fetchone()
+                return result
+            except:
+                print("error")
+                return None
 
