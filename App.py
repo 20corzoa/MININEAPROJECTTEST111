@@ -1,12 +1,20 @@
 import streamlit as st
+<<<<<<< Updated upstream
 import _mysql_connector
+=======
+
+>>>>>>> Stashed changes
 import databasetest as dbt
 
 def login():
     st.title("JUDD TRIPS")                                         
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
+<<<<<<< Updated upstream
     #st.write(myDatabase.read_all_user()) 
+=======
+    st.write(myDatabase.read_all_user()) 
+>>>>>>> Stashed changes
     if st.button("LOGIN"):
         if myDatabase.verify_user(username, password) == True:
             roleID = myDatabase.read_user_role(username)
