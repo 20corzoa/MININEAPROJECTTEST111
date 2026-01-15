@@ -290,6 +290,22 @@ class dataBase:
         except Exception as e:
             print(f"error reading userID from username: {e}")
             return None
+
+    def read_username_from_userID(self, userID):
+        try:
+            query = "SELECT username FROM user WHERE userID = %s"
+            values = (userID,)
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone()
+            if result:
+                return result[0]
+            else:
+                print(f"No user found with userID: {userID}")
+                return None
+
+        except Exception as e:
+            print(f"error reading username from userID: {e}")
+            return None
         
     def read_user_role(self, userID):
         try:
@@ -518,18 +534,16 @@ class dataBase:
             print("error")
             return []
         
-    def read_documents_by_leader(self, leaderID):
+    def read_students_for_trip(self, tripID):
         try:
-            query = """SELECT t.destination, d.* FROM documents as d
-                       JOIN trip_information as ti ON d.documentID = ti.documentID
-                       JOIN trip as t ON ti.tripID = t.tripID
-                       WHERE t.leaderID = %s"""
-            values = (leaderID,)
-            print(f"DEBUG: leaderID = {leaderID}")
+            query = """SELECT s.studentID, s.fName, s.lName
+                       FROM student as s
+                       JOIN trip_students ts ON s.studentID = ts.studentID
+                       WHERE ts.tripID = %s"""
+            values = (tripID,)
             self.cursor.execute(query, values)
             results = self.cursor.fetchall()
-            print(f"DEBUG: results = {results}")
             return results
         except Exception as e:
-            print(f"error in read_documents_by_leader: {e}")
+            print(f"error reading students for trip: {e}")
             return []
