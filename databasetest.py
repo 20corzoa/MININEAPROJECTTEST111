@@ -60,9 +60,9 @@ class dataBase:
     def read_student_by_id(self, studentID):
         try:
             query = "SELECT * FROM student WHERE studentID = %s"
-            values = (studentID)
-            self.cursor().execute(query, values)
-            result = self.cursor().fetchone() #fetches one result
+            values = (studentID,)
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone() #fetches one result
             return result
         except:
             print("error")
@@ -133,7 +133,7 @@ class dataBase:
         try:
             query = "INSERT INTO trip(destination, date, returnDate, status, leaderID) VALUES(%s, %s, %s, %s, %s)"
             values = (destination, date, returnDate, status, leaderID)
-            self.cursor().execute(query, values)
+            self.cursor.execute(query, values)
             self.db.commit()
             print("trip created")
         except:
@@ -143,8 +143,8 @@ class dataBase:
     def read_all_trips(self):
         try:
             query = "SELECT * FROM trip"
-            self.cursor().execute(query)
-            results = self.cursor().fetchall()
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
             return results
         except:
             print("error")
@@ -153,9 +153,9 @@ class dataBase:
     def read_trip_by_id(self, tripID):
         try:
             query = "SELECT * FROM trip WHERE tripID = %s"
-            values = (tripID)
-            self.cursor().execute(query, values)
-            result = self.cursor().fetchone()
+            values = (tripID,)
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone()
             return result
         except:
             print("error")
@@ -164,9 +164,9 @@ class dataBase:
     def read_trips_by_leader(self, leaderID):
         try:
             query = "SELECT * FROM trip WHERE leaderID = %s"
-            values = (leaderID)
-            self.cursor().execute(query, values)
-            results = self.cursor().fetchall()
+            values = (leaderID,)
+            self.cursor.execute(query, values)
+            results = self.cursor.fetchall()
             return results
         except:
             print("error")
@@ -175,9 +175,9 @@ class dataBase:
     def read_trips_by_destination(self, destination):
         try:
             query = "SELECT * FROM trip WHERE destination = %s"
-            values = (destination)
-            self.cursor().execute(query, values)
-            results = self.cursor().fetchall()
+            values = (destination,)
+            self.cursor.execute(query, values)
+            results = self.cursor.fetchall()
             return results
         except:
             print("error")
@@ -192,7 +192,7 @@ class dataBase:
                 values.append(value)
             values.append(tripID)
             query = f"UPDATE trip SET {', '.join(fields)} WHERE tripID = %s"
-            self.cursor().execute(query, tuple(values))
+            self.cursor.execute(query, tuple(values))
             self.db.commit()
             print("trip updated")
         except:
@@ -202,8 +202,8 @@ class dataBase:
     def delete_trip(self, tripID):
         try:
             query = "DELETE FROM trip WHERE tripID = %s"
-            values = (tripID)
-            self.cursor().execute(query, values)
+            values = (tripID,)
+            self.cursor.execute(query, values)
             self.db.commit()
             print("trip deleted")
         except:
@@ -219,7 +219,7 @@ class dataBase:
         try:
             query = "INSERT INTO trip_student (tripID, studentID) VALUES (%s, %s)"
             values = (tripID, studentID)
-            self.cursor().execute(query, values)
+            self.cursor.execute(query, values)
             self.db.commit()
             print("student assigned to trip")
         except:
@@ -230,7 +230,7 @@ class dataBase:
         try:
             query = "DELETE FROM trip_student WHERE tripID = %s AND studentID = %s"
             values = (tripID, studentID)
-            self.cursor().execute(query, values)
+            self.cursor.execute(query, values)
             self.db.commit()
             print("student removed from trip")
         except:
@@ -240,9 +240,9 @@ class dataBase:
     def get_trip_student(self, tripID): #get all student assigned to a trip
         try:
             query = "SELECT studentID FROM trip_student WHERE tripID = %s"
-            values = (tripID)
-            self.cursor().execute(query, values)
-            results = self.cursor().fetchall()
+            values = (tripID,)
+            self.cursor.execute(query, values)
+            results = self.cursor.fetchall()
             return results
         except:
             print("error")
@@ -251,9 +251,9 @@ class dataBase:
     def get_student_trips(self, studentID): #get all trips a student is assigned to
         try:
             query = "SELECT tripID FROM trip_student WHERE studentID = %s"
-            values = (studentID)
-            self.cursor().execute(query, values)
-            results = self.cursor().fetchall()
+            values = (studentID,)
+            self.cursor.execute(query, values)
+            results = self.cursor.fetchall()
             return results
         except:
             print("error")
@@ -294,7 +294,7 @@ class dataBase:
     def read_user_role(self, username):
         try:
             query = "SELECT role FROM users WHERE username = %s"
-            values = (username)
+            values = (username,)
             self.cursor.execute(query, values)
             result = self.cursor.fetchone()
             if result:
@@ -308,7 +308,7 @@ class dataBase:
     def read_user_by_username(self, username):
         try:
             query = "SELECT * FROM user WHERE username = %s"
-            values = (username)
+            values = (username,)
             self.cursor.execute(query, values)
             result = self.cursor.fetchone()
             return result
@@ -351,7 +351,7 @@ class dataBase:
     def read_user_by_id(self, userID):
         try:
             query = "SELECT * FROM user WHERE userID = %s"
-            values = (userID)
+            values = (userID,)
             self.cursor.execute(query, values)
             result = self.cursor.fetchone()
             return result
@@ -438,7 +438,7 @@ class dataBase:
     def read_medical_info_by_id(self, medicalID):
         try:
             query = "SELECT * FROM medical_information WHERE medicalID = %s"
-            values = (medicalID)
+            values = (medicalID,)
             self.cursor.execute(query, values)
             result = self.cursor.fetchone()
             return result
@@ -462,7 +462,7 @@ class dataBase:
                        JOIN student ON medical_information.medicalID = student.medicalID
                        JOIN trip_student ON student.studentID = trip_student.studentID
                        WHERE trip_student.tripID = %s"""
-            values = (tripID)
+            values = (tripID,)
             self.cursor.execute(query, values)
             results = self.cursor.fetchall()
             return results
@@ -489,7 +489,7 @@ class dataBase:
     def delete_medical_info(self, medicalID):
         try:
             query = "DELETE FROM medical_information WHERE medicalID = %s"
-            values = (medicalID)
+            values = (medicalID,)
             self.cursor.execute(query, values)
             self.db.commit()
             print("medical information deleted")
@@ -500,7 +500,7 @@ class dataBase:
     def read_emergency_info_by_id(self, studentID):
             try:
                 query = "SELECT * FROM emergency_contact WHERE studentID = %s"
-                values = (studentID)
+                values = (studentID,)
                 self.cursor.execute(query, values)
                 result = self.cursor.fetchone()
                 return result
@@ -508,3 +508,28 @@ class dataBase:
                 print("error")
                 return None
 
+    def read_all_documents(self):
+        try:
+            query = "SELECT * FROM documents"
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
+            return results
+        except:
+            print("error")
+            return []
+        
+    def read_documents_by_leader(self, leaderID):
+        try:
+            query = """SELECT t.destination, d.* FROM documents as d
+                       JOIN trip_information as ti ON d.documentID = ti.documentID
+                       JOIN trip as t ON ti.tripID = t.tripID
+                       WHERE t.leaderID = %s"""
+            values = (leaderID,)
+            print(f"DEBUG: leaderID = {leaderID}")
+            self.cursor.execute(query, values)
+            results = self.cursor.fetchall()
+            print(f"DEBUG: results = {results}")
+            return results
+        except Exception as e:
+            print(f"error in read_documents_by_leader: {e}")
+            return []
