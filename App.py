@@ -9,8 +9,9 @@ def login():
     #st.write(myDatabase.read_all_user()) 
     if st.button("LOGIN"):
         if myDatabase.verify_user(username, password) == True:
-            roleID = myDatabase.read_user_role(username)
-            role = "ADMIN" if roleID == "1" else "TEACHER"
+            roleID = myDatabase.read_user_role(userID=myDatabase.read_userID_from_username(username))
+            print(f"roleID: {roleID}")
+            role = "ADMIN" if str(roleID) == "1" else "TEACHER"
             st.session_state.username = username
             st.session_state.userID = myDatabase.read_userID_from_username(username)
             st.session_state.role = role

@@ -291,18 +291,18 @@ class dataBase:
             print(f"error reading userID from username: {e}")
             return None
         
-    def read_user_role(self, username):
+    def read_user_role(self, userID):
         try:
-            query = "SELECT role FROM users WHERE username = %s"
-            values = (username,)
+            query = "SELECT role_roleID FROM user WHERE userID = %s"
+            values = (userID,)
             self.cursor.execute(query, values)
             result = self.cursor.fetchone()
             if result:
-                return str(result[0]) if result and result[0] is not None else None
+                return result[0]
             else:
                 return None
-        except:
-            print("error")
+        except Exception as e:
+            print(f"error in read_user_role: {e}")
             return None
 
     def read_user_by_username(self, username):
