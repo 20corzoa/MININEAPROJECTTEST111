@@ -1,3 +1,11 @@
 import streamlit as st
 st.header("Teacher Home")
 st.write(f"You are logged in as {st.session_state.role}")
+st.write(f"Your user ID is {st.session_state.userID}")
+st.write(f"Your username is {st.session_state.username}")
+st.write("Welcome to the Teacher Home Page!")
+st.write("From here, you can navigate to other sections using the sidebar.")
+st.write("Please select an option from the sidebar to get started.")
+st.write("If you need assistance, please contact the administrator.")
+st.write("Thank you for using the Judd Trips Management System!")
+st.write("Have a great day!")

@@ -1,3 +1,11 @@
 import streamlit as st
 st.header("Admin Home")
 st.write(f"You are logged in as {st.session_state.role}")
+st.write(f"UserID: {st.session_state.userID}")
+st.write(f"Username: {st.session_state.username}")
+st.write("Welcome to the Admin Home Page!")
+st.write("From here, you can navigate to other sections using the sidebar.")
+st.write("Please select an option from the sidebar to get started.")
+st.write("If you need assistance, please contact the system administrator.")
+st.write("Thank you for using the Judd Trips Management System!")
+st.write("Have a great day!")

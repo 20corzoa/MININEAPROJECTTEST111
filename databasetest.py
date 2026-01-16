@@ -72,6 +72,22 @@ class dataBase:
             print("error")
             return None
         
+    def read_student_by_name(self, studentFullName):
+        try:
+            self.cursor = self.db.cursor()
+            studentfName = studentFullName.split(" ")[0]
+            studentlName = studentFullName.split(" ")[1]
+            query = "SELECT studentid FROM students WHERE fName = %s AND lName = %s LIMIT 1"
+            values = (studentfName, studentlName)
+            print(query)
+            print(values)
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone() #fetches one result
+            return result
+        except Exception as e:
+            print("error reading student by name :", e)
+            return None
+        
 
     def update_student(self, studentID, fName, lNName, gender, dob, year, form, house, sEmail, sPhone, consent, contactID, medicalID): 
         fields = []
@@ -162,6 +178,20 @@ class dataBase:
             print("error reading all trips :", e)
             return []
     
+    def read_trip_by_Destination(self, tripDestination):
+        try:
+            self.cursor = self.db.cursor()
+            query = f"SELECT tripid FROM trips WHERE upper(destination) = upper('{tripDestination}')"
+            values = ()
+            print(query)
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone()
+            print("Trip ID fetched: ", result)
+            return result
+        except Exception as e:
+            print("error getting trip by destination :", e)
+            return None
+
     def read_trip_by_id(self, tripID):
         try:
             query = "SELECT * FROM trips WHERE tripID = %s"
@@ -191,23 +221,38 @@ class dataBase:
             self.cursor().execute(query, values)
             results = self.cursor().fetchall()
             return results
-        except:
-            print("error")
+        except Exception as e:
+            print("error reading trips by destination :", e)
             return []
         
-    def update_trip(self, tripID, **kwargs):
+    def update_trip(self, tripID, destination, date, returnDate, status, leaderID):
         fields = []
         values = []
         try:
-            for key, value in kwargs.items():
-                fields.append(f"{key} = %s")
-                values.append(value)
-            values.append(tripID)
+            self.cursor = self.db.cursor()
+            print(self.cursor)
+            fields.append("destination = %s")
+            values.append(destination)
+            fields.append("`date` = %s")
+            values.append(str(date))
+            fields.append("`returnDate` = %s")
+            values.append(str(returnDate))
+            fields.append("status = %s")
+            values.append(status)
+            fields.append("leaderID = %s")
+            values.append(leaderID)
             query = f"UPDATE trips SET {', '.join(fields)} WHERE tripID = %s"
-            self.cursor().execute(query, tuple(values))
+            values.append(tripID)
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+            print("QUERY:", query)
+            print("VALUES:", values)
+            print("TYPES:", [type(v) for v in values])
+            self.cursor.execute(query, tuple(values))
+            print(self.cursor.statement)
             self.db.commit()
             print("trip updated")
-        except:
+        except Exception as e:
+            print("error updating trip :", e)
             self.db.rollback()
             print("error")
 
@@ -229,37 +274,50 @@ class dataBase:
     #trip asssign and removing functions
 
 
-    def assign_student_to_trip(self, tripID, studentID):
+    def assign_student_to_trip(self, tripDestination, studentFullName):
         try:
-            query = "INSERT INTO trip_students (tripID, studentID) VALUES (%s, %s)"
-            values = (tripID, studentID)
-            self.cursor().execute(query, values)
+            self.cursor = self.db.cursor()
+            studentID = self.read_student_by_name(studentFullName)
+            tripID = self.read_trip_by_Destination(tripDestination)
+            query = "INSERT INTO tripstudents (tripID, studentID) VALUES (%s, %s)"
+            print(query)
+            values = [*tripID, *studentID]
+            print("Assigning student to trip with values:", values)
+            self.cursor.execute(query, values)
             self.db.commit()
             print("student assigned to trip")
-        except:
+        except Exception as e:
             self.db.rollback()
-            print("error")
+            print("error adding student to trip :", e)
 
-    def remove_student_from_trip(self, tripID, studentID):
+    def remove_student_from_trip(self, tripDestination, studentFullName):
         try:
-            query = "DELETE FROM trip_students WHERE tripID = %s AND studentID = %s"
-            values = (tripID, studentID)
-            self.cursor().execute(query, values)
+            self.cursor = self.db.cursor()
+            studentID = self.read_student_by_name(studentFullName)     
+            tripID = self.read_trip_by_Destination(tripDestination) 
+            query = "DELETE FROM tripstudents WHERE tripID = %s AND studentID = %s"
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+            print(tripID, studentID, query)
+            values = [*tripID, *studentID]
+            self.cursor.execute(query, values)
             self.db.commit()
             print("student removed from trip")
         except:
             self.db.rollback()
-            print("error")
+            print("error removing student from trip]")
     
-    def get_trip_students(self, tripID): #get all students assigned to a trip
+    def get_trip_students(self, tripDestination): #get all students assigned to a trip
         try:
-            query = "SELECT studentID FROM trip_students WHERE tripID = %s"
-            values = (tripID)
-            self.cursor().execute(query, values)
-            results = self.cursor().fetchall()
+            self.cursor = self.db.cursor()
+            tripID = self.read_trip_by_Destination(tripDestination)
+            query = "SELECT studentID FROM tripstudents WHERE tripID = %s"
+            print(f"Trip destination: %s Query: %s and tripID: %d", tripDestination, query, tripID)
+            values = tripID
+            self.cursor.execute(query, values)
+            results = self.cursor.fetchall()
             return results
-        except:
-            print("error")
+        except Exception as e:
+            print("error getting trip students : ", e)
             return []
     
     def get_student_trips(self, studentID): #get all trips a student is assigned to
